@@ -32,13 +32,13 @@ void *threadFun(void *filename){
    pthread_mutex_unlock(&lock);
 
    char my_filename[50];
-   sprintf(my_filename,"%s_%d",(char*)filename,myid);
+   sprintf(my_filename,"%s_%d.txt",(char*)filename,myid);
 
    printf("Thread %d will read %s \n",myid,(char*)my_filename);
 
 //  your code goes here.
 
-   FILE *fptr = fopen("%s_%d.txt",filename,myid,"r");
+   FILE *fptr = fopen(my_filename,"r");
    char process_type;
    int process_id, process_size;
 
@@ -55,7 +55,9 @@ void *threadFun(void *filename){
    }
 }
 
-void first_fit(int process_id, int process_size){}
+void first_fit(int process_id, int process_size){
+   printf("At kafası \n");
+}
 
 void best_fit(int process_id, int process_size){}
 
@@ -72,7 +74,7 @@ void start_process(int process_id, int process_size){
       case 3 :
          worst_fit(process_id, process_size);
          break;
-      case default:
+      default:
          printf("Wrong method !\n");
          break;
    }
