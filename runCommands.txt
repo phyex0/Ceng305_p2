@@ -1,0 +1,3 @@
+gcc mmu.c -o mmu -lpthread
+./mmu 4096 memory 1
+git checkout -b branchName
