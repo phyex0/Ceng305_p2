@@ -42,6 +42,7 @@ void print_report();
 void first_fit(int process_id, int process_size);
 void best_fit(int process_id, int process_size);
 void worst_fit(int process_id, int process_size);
+void put_process_to_index(int worst_ind, int frame_size, int process_id, int process_size);
 
 void *threadFun(void *filename)
 {
@@ -118,7 +119,34 @@ void worst_fit(int process_id, int process_size)
    int frame_size = process_size / 4;
    if (insufficent_check(process_id, temp_size, frame_size) == 1)
    {
-      //Fill this
+      int left = 0, right = 0, space;
+      int worst_ind = -1, worst_size = 0;
+
+      for (; right < MEMORY_size; right++)
+      {
+         if (MEMORY[right] != 0)
+         {
+            space = right - left;
+            if (space >= frame_size && worst_size <= space)
+            {
+               worst_ind = left;
+               worst_size = space;
+            }
+            left = right + 1;
+         }
+      }
+      space = right - left;
+      if (space >= frame_size && worst_size <= space)
+      {
+         worst_ind = left;
+         worst_size = space;
+      }
+
+      if (worst_ind != -1)
+         put_process_to_index(worst_ind, frame_size, process_id, process_size);
+
+      else
+         printf("B\t%d\t%d\t-> %d frames will be used, ERROR! External fragmentation\n", process_id, temp_size, frame_size);
    }
 }
 
@@ -147,20 +175,36 @@ void end_process(int process_id) {}
 //@fuzuli
 int insufficent_check(int process_id, int temp_size, int frame_size)
 {
+   int remaining_frames = 0;
+   for (int i = 0; i < MEMORY_size; i++)
+      if (MEMORY[i] == 0)
+         remaining_frames++;
 
-   if (MEMORY_size < frame_size)
+   if (remaining_frames < frame_size)
    {
-      printf("B\t%d\t%d\t-> ERROR! Insufficient memory", process_id, temp_size);
+      printf("B\t%d\t%d\t-> ERROR! Insufficient memory\n", process_id, temp_size);
       INSUFFICIENT_MEMORY_COUNT += 1;
-      printf("0");
       return 0;
    }
-   printf("1");
    return 1;
 }
 
 //@phyex
 void print_report() {}
+
+void put_process_to_index(int index, int frame_size, int process_id, int process_size)
+{
+
+   for (int i = index; i < frame_size + index; i++)
+      MEMORY[i] = process_id;
+
+   int remaining_frames = 0;
+   for (int i = 0; i < MEMORY_size; i++)
+      if (MEMORY[i] == 0)
+         remaining_frames++;
+
+   printf("B\t%d\t%d\t-> %d frames will be used, remaining #frames: %d\n", process_id, process_size, frame_size, remaining_frames);
+}
 
 //
 // Do not modify main function
