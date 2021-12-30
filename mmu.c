@@ -38,8 +38,49 @@ void *threadFun(void *filename){
 
 //  your code goes here.
 
+   FILE *fptr = fopen("%s_%d.txt",filename,myid,"r");
+   char process_type;
+   int process_id, process_size;
 
+   while(feof(fptr) != 1){
+      fscanf(fptr, "%c %d", &process_type, &process_id);
+      if(process_type == 'B'){
+         fscanf(fptr, "%d", &process_size);
+         start_process(process_id, process_size);
+      }
+
+      else
+         end_process(process_id);
+
+   }
 }
+
+void first_fit(int process_id, int process_size){}
+
+void best_fit(int process_id, int process_size){}
+
+void worst_fit(int process_id, int process_size){}
+
+void start_process(int process_id, int process_size){
+   switch(method){
+      case 1 :
+         first_fit(process_id, process_size);
+         break;
+      case 2 :
+         best_fit(process_id, process_size);
+         break;
+      case 3 :
+         worst_fit(process_id, process_size);
+         break;
+      case default:
+         printf("Wrong method !\n");
+         break;
+   }
+}
+
+void end_process(int process_id){}
+
+void insufficent_check(){}
 
 //
 // Do not modify main function

@@ -1,0 +1,2 @@
+gcc mmu.c -o mmu -lpthread
+./mmu 4096 memory_0.txt 1
