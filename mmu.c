@@ -35,6 +35,14 @@ int WASTED_INTERNAL_MEMORY = 0;
 int EXTERNAL_FRAGMENTATION_COUNT = 0;
 int INSUFFICIENT_MEMORY_COUNT = 0;
 
+void start_process(int process_id, int process_size);
+void end_process(int process_id);
+int insufficent_check(int process_id, int temp_size, int frame_size);
+void print_report();
+void first_fit(int process_id, int process_size);
+void best_fit(int process_id, int process_size);
+void worst_fit(int process_id, int process_size);
+
 void *threadFun(void *filename)
 {
    int myid;
@@ -66,6 +74,7 @@ void *threadFun(void *filename)
       else
          end_process(process_id);
    }
+   return 0;
 }
 // use insufficent to be sure empty spaces exist on mem !
 //@phyex
@@ -77,9 +86,9 @@ void first_fit(int process_id, int process_size)
       process_size += wasted_internal_memory;
 
    int frame_size = process_size / 4;
-   if (insufficent_check(process_id, temp_size, frame_size) == 0)
+   if (insufficent_check(process_id, temp_size, frame_size) == 1)
    {
-      //Fill this
+      // Fill this
    }
 }
 
@@ -92,7 +101,7 @@ void best_fit(int process_id, int process_size)
       process_size += wasted_internal_memory;
 
    int frame_size = process_size / 4;
-   if (insufficent_check(process_id, temp_size, frame_size) == 0)
+   if (insufficent_check(process_id, temp_size, frame_size) == 1)
    {
       //Fill this
    }
@@ -107,7 +116,7 @@ void worst_fit(int process_id, int process_size)
       process_size += wasted_internal_memory;
 
    int frame_size = process_size / 4;
-   if (insufficent_check(process_id, temp_size, frame_size) == 0)
+   if (insufficent_check(process_id, temp_size, frame_size) == 1)
    {
       //Fill this
    }
@@ -143,8 +152,10 @@ int insufficent_check(int process_id, int temp_size, int frame_size)
    {
       printf("B\t%d\t%d\t-> ERROR! Insufficient memory", process_id, temp_size);
       INSUFFICIENT_MEMORY_COUNT += 1;
+      printf("0");
       return 0;
    }
+   printf("1");
    return 1;
 }
 
