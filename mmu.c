@@ -9,6 +9,13 @@
  *
  * @group_id 00
  * @author  your names
+   Halit Burak Yeşildal          18050111043
+   Enes Güler                    18050111005
+   Yakup Batuhan Ördek           18050111041
+   Ayşe Tüncer                   170501110580
+   Zeynep Nur Tüncel             17050111011
+   Berna Altun                   16050111040
+  
  *
  * @version 1.0, 23/12/21
  */
@@ -23,6 +30,12 @@ int *MEMORY;
 int MEMORY_size;
 pthread_mutex_t lock;
 int method;
+
+//defined by us
+int WASTED_INTERNAL_MEMORY = 0;
+int EXTERNAL_FRAGMENTATION_COUNT = 0;
+int INSUFFICIENT_MEMORY_COUNT = 0;
+
 
 void *threadFun(void *filename){
    int myid;
@@ -54,13 +67,16 @@ void *threadFun(void *filename){
 
    }
 }
-
+// use insufficent to be sure empty spaces exist on mem !
+//@phyex
 void first_fit(int process_id, int process_size){
-   printf("At kafası \n");
+   
 }
 
+//@ark
 void best_fit(int process_id, int process_size){}
 
+//@fuzuli
 void worst_fit(int process_id, int process_size){}
 
 void start_process(int process_id, int process_size){
@@ -80,9 +96,31 @@ void start_process(int process_id, int process_size){
    }
 }
 
+//@ark
 void end_process(int process_id){}
 
-void insufficent_check(){}
+//@fuzuli
+int insufficent_check(int process_id){
+   /*
+   //temp_size = input val, frame_size = round(input size / 4)
+   //wasted_internal_memory = (4 - size % 4) % 4
+
+   def insufficientCheck(process_id, temp_size, frame_size):
+    global INSUFFICIENT_MEMORY_COUNT, MEMORY_FRAME
+    if MEMORY_FRAME < frame_size:
+        print(f"B\t{process_id}\t{temp_size}\t-> ERROR! Insufficient memory")
+        INSUFFICIENT_MEMORY_COUNT += 1
+        return False
+    return True
+   
+   */
+
+
+
+}
+
+//@phyex
+void print_report(){}
 
 //
 // Do not modify main function
