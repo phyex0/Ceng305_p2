@@ -107,8 +107,6 @@ void best_fit(int process_id, int process_size)
       int minSizeDifference = 1024;
 
       for (int i=0; i< MEMORY_size; i++){
-         // Find the best fit block for current process
-
          //find min size difference
          if(process_size <= MEMORY_size[i]){
             if (bestIdx == -1)
