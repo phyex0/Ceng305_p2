@@ -109,28 +109,34 @@ void best_fit(int process_id, int process_size)
 	
 	   int bestIdx = -1;
    	int minSizeDifference = 0;
-      int i =0;
-   	for (; i< MEMORY_size; i++){      
-		//find min size difference
-		if(process_size >= MEMORY[i]){
-		  if (bestIdx == -1)
-		    bestIdx = i;
-
-
-		  else if((MEMORY[i] - process_size) < minSizeDifference && minSizeDifference >= frame_size){
-		        bestIdx = i; 
-		        minSizeDifference = (MEMORY[i] - process_size);
-		    }
-		}  
+      int remaining_frames = 0;
 
       
+      for (int i = 0; i < MEMORY_size; i++)
+         if (MEMORY[i] == 0)
+            remaining_frames++;
+
+      
+
+   	for (int i = 0; i< MEMORY_size; i++){      
+         //find min size difference
+         if(process_size >= MEMORY[i]){
+            if (bestIdx == -1)
+               bestIdx = i;
+
+            else if((MEMORY[i] - process_size) < minSizeDifference ){
+                  bestIdx = i; 
+                  minSizeDifference = (MEMORY[i] - process_size);
+               }
+            
+            
+         }  
       }
 
       
+      
 
-     
-
-      if (bestIdx != -1)
+      if (bestIdx != -1 && remaining_frames > frame_size)
          put_process_to_index(bestIdx, frame_size, process_id, process_size);
 
       else
