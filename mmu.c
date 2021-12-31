@@ -101,11 +101,56 @@ void best_fit(int process_id, int process_size)
       process_size += wasted_internal_memory;
 
    int frame_size = process_size / 4;
-   if (insufficent_check(process_id, temp_size, frame_size) == 1)
-   {
-      //Fill this
-   }
+   if (insufficent_check(process_id, temp_size, frame_size) == 1){
+      
+      int bestIdx = -1;
+      int minSizeDifference = 1024;
+
+      for (int i=0; i< MEMORY_size; i++){
+         // Find the best fit block for current process
+
+         //find min size difference
+         if(process_size <= MEMORY_size[i]){
+            if (bestIdx == -1)
+               bestIdx = i;
+
+
+            else if((MEMORY_size[i] -process_size) < minSizeDifference){
+               bestIdx = i;
+               minSizeDifference = (MEMORY_size[i] - process_size);
+            }
+         }
+      }
+
+
+
+      if (bestIdx != -1)
+         put_process_to_index(bestIdx, frame_size, process_id, process_size);
+
+      else
+         printf("B\t%d\t%d\t-> %d frames will be used, ERROR! External fragmentation\n", process_id, temp_size, frame_size);
+
+            
 }
+
+
+if (MEMORY_size[i] >= process_size){
+            {
+                if (bestIdx == -1)
+                    bestIdx = i;
+                else if (MEMORY_size[i] > process_size)
+                    bestIdx = i;
+            }
+}
+
+
+
+///////////////////////////////////////////////
+
+
+
+   }
+
 
 //@fuzuli
 void worst_fit(int process_id, int process_size)
@@ -118,12 +163,69 @@ void worst_fit(int process_id, int process_size)
    int frame_size = process_size / 4;
    if (insufficent_check(process_id, temp_size, frame_size) == 1)
    {
-      //Fill this
+      int wasted_internal_memory = (4 - process_size % 4) % 4;
+   int temp_size = process_size;
+   if (wasted_internal_memory != 0)
+      process_size += wasted_internal_memory;
+
+   int frame_size = process_size / 4;
+   if (insufficent_check(process_id, temp_size, frame_size) == 1)
+   {
+      ////////////////////////////////////////////////////////////////////////////////
+      int left = 0, right = 0, space;
+      int worst_ind = -1, worst_size = 0;
+
+      for (; right < MEMORY_size; right++)
+      {
+         if (MEMORY[right] != 0)
+         {
+            space = right - left;
+            if (space >= frame_size && worst_size <= space)
+            {
+               worst_ind = left;
+               worst_size = space;
+            }
+            left = right + 1;
+         }
+      }
+      space = right - left;
+      if (space >= frame_size && worst_size <= space)
+      {
+         worst_ind = left;
+         worst_size = space;
+      }
+
+      if (worst_ind != -1)
+         put_process_to_index(worst_ind, frame_size, process_id, process_size);
+
+      else
+         printf("B\t%d\t%d\t-> %d frames will be used, ERROR! External fragmentation\n", process_id, temp_size, frame_size);
+   }
+   ///////////////////////////////////////////////////////////////////////////////////77
    }
 }
 
 void start_process(int process_id, int process_size)
 {
+   switch (method)
+   {
+   case 1:
+      end_process(process_id);
+      break;
+   case 2:
+      end_process(process_id);;
+      break;
+   case 3:
+      end_process(process_id);
+      break;
+   default:
+      printf("Wrong method !\n");
+      break;
+   }
+}
+
+//@ark
+void end_process(int process_id) {
    switch (method)
    {
    case 1:
@@ -140,9 +242,6 @@ void start_process(int process_id, int process_size)
       break;
    }
 }
-
-//@ark
-void end_process(int process_id) {}
 
 //@fuzuli
 int insufficent_check(int process_id, int temp_size, int frame_size)
