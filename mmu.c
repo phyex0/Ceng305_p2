@@ -42,6 +42,7 @@ void print_report();
 void first_fit(int process_id, int process_size);
 void best_fit(int process_id, int process_size);
 void worst_fit(int process_id, int process_size);
+void put_process_to_index(int worst_ind, int frame_size, int process_id, int process_size);
 
 void *threadFun(void *filename)
 {
@@ -71,8 +72,9 @@ void *threadFun(void *filename)
          start_process(process_id, process_size);
       }
 
-      else
+      else if(process_type == 'E'){  
          end_process(process_id);
+      }
    }
    return 0;
 }
@@ -101,54 +103,41 @@ void best_fit(int process_id, int process_size)
       process_size += wasted_internal_memory;
 
    int frame_size = process_size / 4;
-   if (insufficent_check(process_id, temp_size, frame_size) == 1){
+   if (insufficent_check(process_id, temp_size, frame_size) == 1)
+   {
+      //////////////////////////////
+	
+	   int bestIdx = -1;
+   	int minSizeDifference = 0;
+      int i =0;
+   	for (; i< MEMORY_size; i++){      
+		//find min size difference
+		if(process_size >= MEMORY[i]){
+		  if (bestIdx == -1)
+		    bestIdx = i;
+
+
+		  else if((MEMORY[i] - process_size) < minSizeDifference && minSizeDifference >= frame_size){
+		        bestIdx = i; 
+		        minSizeDifference = (MEMORY[i] - process_size);
+		    }
+		}  
+
       
-      int bestIdx = -1;
-      int minSizeDifference = 1024;
-
-      for (int i=0; i< MEMORY_size; i++){
-         //find min size difference
-         if(process_size <= MEMORY_size[i]){
-            if (bestIdx == -1)
-               bestIdx = i;
-
-
-            else if((MEMORY_size[i] -process_size) < minSizeDifference){
-               bestIdx = i;
-               minSizeDifference = (MEMORY_size[i] - process_size);
-            }
-         }
       }
 
+      
 
+     
 
       if (bestIdx != -1)
          put_process_to_index(bestIdx, frame_size, process_id, process_size);
 
       else
          printf("B\t%d\t%d\t-> %d frames will be used, ERROR! External fragmentation\n", process_id, temp_size, frame_size);
-
-            
-}
-
-
-if (MEMORY_size[i] >= process_size){
-            {
-                if (bestIdx == -1)
-                    bestIdx = i;
-                else if (MEMORY_size[i] > process_size)
-                    bestIdx = i;
-            }
-}
-
-
-
-///////////////////////////////////////////////
-
-
-
+	///////////////////////////////////
    }
-
+}
 
 //@fuzuli
 void worst_fit(int process_id, int process_size)
@@ -161,15 +150,6 @@ void worst_fit(int process_id, int process_size)
    int frame_size = process_size / 4;
    if (insufficent_check(process_id, temp_size, frame_size) == 1)
    {
-      int wasted_internal_memory = (4 - process_size % 4) % 4;
-   int temp_size = process_size;
-   if (wasted_internal_memory != 0)
-      process_size += wasted_internal_memory;
-
-   int frame_size = process_size / 4;
-   if (insufficent_check(process_id, temp_size, frame_size) == 1)
-   {
-      ////////////////////////////////////////////////////////////////////////////////
       int left = 0, right = 0, space;
       int worst_ind = -1, worst_size = 0;
 
@@ -177,7 +157,7 @@ void worst_fit(int process_id, int process_size)
       {
          if (MEMORY[right] != 0)
          {
-            space = right - left;
+            space = right - left;               //>=//
             if (space >= frame_size && worst_size <= space)
             {
                worst_ind = left;
@@ -186,7 +166,7 @@ void worst_fit(int process_id, int process_size)
             left = right + 1;
          }
       }
-      space = right - left;
+      space = right - left;               //>=//
       if (space >= frame_size && worst_size <= space)
       {
          worst_ind = left;
@@ -199,31 +179,10 @@ void worst_fit(int process_id, int process_size)
       else
          printf("B\t%d\t%d\t-> %d frames will be used, ERROR! External fragmentation\n", process_id, temp_size, frame_size);
    }
-   ///////////////////////////////////////////////////////////////////////////////////77
-   }
 }
 
 void start_process(int process_id, int process_size)
 {
-   switch (method)
-   {
-   case 1:
-      end_process(process_id);
-      break;
-   case 2:
-      end_process(process_id);;
-      break;
-   case 3:
-      end_process(process_id);
-      break;
-   default:
-      printf("Wrong method !\n");
-      break;
-   }
-}
-
-//@ark
-void end_process(int process_id) {
    switch (method)
    {
    case 1:
@@ -241,23 +200,58 @@ void end_process(int process_id) {
    }
 }
 
+//@ark
+void end_process(int process_id) {
+   int size=0;
+   for(int i =0 ;i<MEMORY_size;i++){
+      if(MEMORY[i]== process_id){       
+         MEMORY[i] = 0;
+         size++;
+      }
+   }
+   int remaining_frames = 0;
+   for (int i = 0; i < MEMORY_size; i++)
+      if (MEMORY[i] == 0)
+         remaining_frames++;
+
+   
+   printf("E\t%d\t\t -> %d frames are deallocated, available #frames: %d \n",process_id,size,remaining_frames);
+
+}
+
 //@fuzuli
 int insufficent_check(int process_id, int temp_size, int frame_size)
 {
+   int remaining_frames = 0;
+   for (int i = 0; i < MEMORY_size; i++)
+      if (MEMORY[i] == 0)
+         remaining_frames++;
 
-   if (MEMORY_size < frame_size)
+   if (remaining_frames < frame_size)
    {
-      printf("B\t%d\t%d\t-> ERROR! Insufficient memory", process_id, temp_size);
+      printf("B\t%d\t%d\t-> ERROR! Insufficient memory\n", process_id, temp_size);
       INSUFFICIENT_MEMORY_COUNT += 1;
-      printf("0");
       return 0;
    }
-   printf("1");
    return 1;
 }
 
 //@phyex
 void print_report() {}
+
+void put_process_to_index(int index, int frame_size, int process_id, int process_size)
+{
+
+   for (int i = index; i < frame_size + index; i++)
+      MEMORY[i] = process_id;
+
+   int remaining_frames = 0;
+   for (int i = 0; i < MEMORY_size; i++)
+      if (MEMORY[i] == 0)
+         remaining_frames++;
+
+   printf("B\t%d\t%d\t-> %d frames will be used, remaining #frames: %d\n", process_id, process_size, frame_size, remaining_frames);
+}
 
 //
 // Do not modify main function
