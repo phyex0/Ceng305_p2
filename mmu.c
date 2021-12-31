@@ -72,8 +72,9 @@ void *threadFun(void *filename)
          start_process(process_id, process_size);
       }
 
-      else
+      else if(process_type == 'E'){  
          end_process(process_id);
+      }
    }
    return 0;
 }
@@ -104,7 +105,43 @@ void best_fit(int process_id, int process_size)
    int frame_size = process_size / 4;
    if (insufficent_check(process_id, temp_size, frame_size) == 1)
    {
-      //Fill this
+      //////////////////////////////
+	
+	   int bestIdx = -1;
+   	int minSizeDifference = 0;
+      int remaining_frames = 0;
+
+      
+      for (int i = 0; i < MEMORY_size; i++)
+         if (MEMORY[i] == 0)
+            remaining_frames++;
+
+      
+
+   	for (int i = 0; i< MEMORY_size; i++){      
+         //find min size difference
+         if(process_size >= MEMORY[i]){
+            if (bestIdx == -1)
+               bestIdx = i;
+
+            else if((MEMORY[i] - process_size) < minSizeDifference ){
+                  bestIdx = i; 
+                  minSizeDifference = (MEMORY[i] - process_size);
+               }
+            
+            
+         }  
+      }
+
+      
+      
+
+      if (bestIdx != -1 && remaining_frames > frame_size)
+         put_process_to_index(bestIdx, frame_size, process_id, process_size);
+
+      else
+         printf("B\t%d\t%d\t-> %d frames will be used, ERROR! External fragmentation\n", process_id, temp_size, frame_size);
+	///////////////////////////////////
    }
 }
 
@@ -126,6 +163,7 @@ void worst_fit(int process_id, int process_size)
       {
          if (MEMORY[right] != 0)
          {
+
             space = right - left;
             if (space >= frame_size && worst_size <= space)
             {
@@ -135,7 +173,9 @@ void worst_fit(int process_id, int process_size)
             left = right + 1;
          }
       }
+
       space = right - left;
+
       if (space >= frame_size && worst_size <= space)
       {
          worst_ind = left;
@@ -170,7 +210,23 @@ void start_process(int process_id, int process_size)
 }
 
 //@ark
-void end_process(int process_id) {}
+void end_process(int process_id) {
+   int size=0;
+   for(int i =0 ;i<MEMORY_size;i++){
+      if(MEMORY[i]== process_id){       
+         MEMORY[i] = 0;
+         size++;
+      }
+   }
+   int remaining_frames = 0;
+   for (int i = 0; i < MEMORY_size; i++)
+      if (MEMORY[i] == 0)
+         remaining_frames++;
+
+   
+   printf("E\t%d\t\t -> %d frames are deallocated, available #frames: %d \n",process_id,size,remaining_frames);
+
+}
 
 //@fuzuli
 int insufficent_check(int process_id, int temp_size, int frame_size)
