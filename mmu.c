@@ -107,37 +107,31 @@ void best_fit(int process_id, int process_size)
    {
       //////////////////////////////
 	
-	   int bestIdx = -1;
-   	int minSizeDifference = 0;
-      int remaining_frames = 0;
+	   int left = 0, right = 0, space;
+      int best_ind = -1, best_size = MEMORY_size;
 
-      
-      for (int i = 0; i < MEMORY_size; i++)
-         if (MEMORY[i] == 0)
-            remaining_frames++;
-
-      
-
-   	for (int i = 0; i< MEMORY_size; i++){      
-         //find min size difference
-         if(process_size >= MEMORY[i]){
-            if (bestIdx == -1)
-               bestIdx = i;
-
-            else if((MEMORY[i] - process_size) < minSizeDifference ){
-                  bestIdx = i; 
-                  minSizeDifference = (MEMORY[i] - process_size);
-               }
-            
-            
-         }  
+      for (; right < MEMORY_size; right++)
+      {
+         if (MEMORY[right] != 0)
+         {
+            space = right - left;               //>=//
+            if (space >= frame_size && best_size >= space)
+            {
+               best_ind = left;
+               best_size = space;
+            }
+            left = right + 1;
+         }
+      }
+      space = right - left;               //>=//
+      if (space >= frame_size && best_size >= space)
+      {
+         best_ind = left;
+         best_size = space;
       }
 
-      
-      
-
-      if (bestIdx != -1 && remaining_frames > frame_size)
-         put_process_to_index(bestIdx, frame_size, process_id, process_size);
+      if (best_ind != -1)
+         put_process_to_index(best_ind, frame_size, process_id, process_size);
 
       else
          printf("B\t%d\t%d\t-> %d frames will be used, ERROR! External fragmentation\n", process_id, temp_size, frame_size);
@@ -186,7 +180,7 @@ void worst_fit(int process_id, int process_size)
          printf("B\t%d\t%d\t-> %d frames will be used, ERROR! External fragmentation\n", process_id, temp_size, frame_size);
    }
 }
-
+//@fuzuli
 void start_process(int process_id, int process_size)
 {
    switch (method)
@@ -226,15 +220,13 @@ void end_process(int process_id) {
 }
 
 //@fuzuli
-int insufficent_check(int process_id, int temp_size, int frame_size)
-{
+int insufficent_check(int process_id, int temp_size, int frame_size){
    int remaining_frames = 0;
    for (int i = 0; i < MEMORY_size; i++)
       if (MEMORY[i] == 0)
          remaining_frames++;
 
-   if (remaining_frames < frame_size)
-   {
+   if (remaining_frames < frame_size){
       printf("B\t%d\t%d\t-> ERROR! Insufficient memory\n", process_id, temp_size);
       INSUFFICIENT_MEMORY_COUNT += 1;
       return 0;
