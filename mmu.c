@@ -157,7 +157,8 @@ void worst_fit(int process_id, int process_size)
       {
          if (MEMORY[right] != 0)
          {
-            space = right - left;               //>=//
+
+            space = right - left;
             if (space >= frame_size && worst_size <= space)
             {
                worst_ind = left;
@@ -166,7 +167,9 @@ void worst_fit(int process_id, int process_size)
             left = right + 1;
          }
       }
-      space = right - left;               //>=//
+
+      space = right - left;
+
       if (space >= frame_size && worst_size <= space)
       {
          worst_ind = left;
