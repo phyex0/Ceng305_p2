@@ -88,30 +88,40 @@ void first_fit(int process_id, int process_size)
    if (wasted_internal_memory != 0)
       process_size += wasted_internal_memory;
 
-   int frame_size = ceil(process_size / 4);
+   int frame_size = process_size / 4;
+
    if (insufficent_check(process_id, temp_size, frame_size) == 1)
    {
       // Fill this
-      int head = 0, valid_blank = 1;
+      int head = 0;
       while(head < MEMORY_size){
+         int valid_blank = 1;
          if(MEMORY[head] == 0){
             for(int i = head; i < head + frame_size && (i < MEMORY_size); i++)
                if(MEMORY[i] != 0){
                   valid_blank = 0;
+                  head += i;
+                  head --;
                   break;
                }
             if(valid_blank){
-               put_process_to_index(head, frame_size, process_id, process_size);
+               if(frame_size + head > MEMORY_size ){
+                  printf("B\t%d\t%d\t-> %d frames will be used, ERROR! External fragmentation\n", process_id, temp_size, frame_size);
+                  EXTERNAL_FRAGMENTATION_COUNT++;
+                  break;
+               }
+
+               put_process_to_index(head, frame_size, process_id, process_size);                 
                break;
             }
             
          }
          head++;
       }
+
+    
    }
 
-   else
-      printf("Failed %d\n",process_id);
 }
 
 //@ark
