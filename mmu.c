@@ -35,6 +35,7 @@ int method;
 int WASTED_INTERNAL_MEMORY = 0;
 int EXTERNAL_FRAGMENTATION_COUNT = 0;
 int INSUFFICIENT_MEMORY_COUNT = 0;
+int remaining_frames;
 
 void start_process(int process_id, int process_size);
 void end_process(int process_id);
@@ -44,6 +45,7 @@ void first_fit(int process_id, int process_size);
 void best_fit(int process_id, int process_size);
 void worst_fit(int process_id, int process_size);
 void put_process_to_index(int worst_ind, int frame_size, int process_id, int process_size);
+int internal_waste_checker(int process_size);
 
 void *threadFun(void *filename)
 {
@@ -100,8 +102,7 @@ void first_fit(int process_id, int process_size)
             for(int i = head; i < head + frame_size && (i < MEMORY_size); i++)
                if(MEMORY[i] != 0){
                   valid_blank = 0;
-                  head += i;
-                  head --;
+                  head += i - 1;
                   break;
                }
             if(valid_blank){
@@ -111,7 +112,8 @@ void first_fit(int process_id, int process_size)
                   break;
                }
 
-               put_process_to_index(head, frame_size, process_id, process_size);                 
+               put_process_to_index(head, frame_size, process_id, process_size);  
+               WASTED_INTERNAL_MEMORY += process_size - temp_size;               
                break;
             }
             
@@ -139,7 +141,7 @@ void best_fit(int process_id, int process_size)
 	
 	   int bestIdx = -1;
    	int minSizeDifference = 0;
-      int remaining_frames = 0;
+      remaining_frames = 0;
 
       
       for (int i = 0; i < MEMORY_size; i++)
@@ -248,7 +250,7 @@ void end_process(int process_id) {
          size++;
       }
    }
-   int remaining_frames = 0;
+   remaining_frames = 0;
    for (int i = 0; i < MEMORY_size; i++)
       if (MEMORY[i] == 0)
          remaining_frames++;
@@ -261,7 +263,7 @@ void end_process(int process_id) {
 //@fuzuli
 int insufficent_check(int process_id, int temp_size, int frame_size)
 {
-   int remaining_frames = 0;
+   remaining_frames = 0;
    for (int i = 0; i < MEMORY_size; i++)
       if (MEMORY[i] == 0)
          remaining_frames++;
@@ -276,15 +278,20 @@ int insufficent_check(int process_id, int temp_size, int frame_size)
 }
 
 //@phyex
-void print_report() {}
+void print_report() {
+   printf("Total free memory in holes: %d frames, %d KB\n",remaining_frames, remaining_frames * 4);
+   printf("Total memory wasted as an internal fragmentation: %d KB\n", WASTED_INTERNAL_MEMORY);
+   printf("Total number of rejected processes due to external fragmentation: %d\n", EXTERNAL_FRAGMENTATION_COUNT);
+   printf("Total number of rejected processes due to insufficient memory: %d\n", INSUFFICIENT_MEMORY_COUNT);
+
+}
 
 void put_process_to_index(int index, int frame_size, int process_id, int process_size)
 {
-
    for (int i = index; i < frame_size + index; i++)
       MEMORY[i] = process_id;
 
-   int remaining_frames = 0;
+   remaining_frames = 0;
    for (int i = 0; i < MEMORY_size; i++)
       if (MEMORY[i] == 0)
          remaining_frames++;
@@ -327,5 +334,6 @@ int main(int argc, char *argv[])
    {
       pthread_join(tid[i], NULL);
    }
+   print_report();
    return 0;
 }
