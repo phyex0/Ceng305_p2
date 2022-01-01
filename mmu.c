@@ -70,10 +70,17 @@ void *threadFun(void *filename)
       {
          fscanf(fptr, "%d", &process_size);
          start_process(process_id, process_size);
+          for(int i = 0; i < MEMORY_size/4 ; i++)
+            printf("%d ", MEMORY[i]);
+         printf("Ekmek\n");
       }
 
       else if(process_type == 'E'){  
          end_process(process_id);
+         printf("end_ executed!\n");
+         for(int i = 0; i < MEMORY_size/4 ; i++)
+            printf("%d ", MEMORY[i]);
+         printf("Ekmek\n");
       }
    }
    return 0;
@@ -91,7 +98,26 @@ void first_fit(int process_id, int process_size)
    if (insufficent_check(process_id, temp_size, frame_size) == 1)
    {
       // Fill this
+      int head = 0, valid_blank = 1;
+      while(head < MEMORY_size / 4){
+         if(MEMORY[head] == 0){
+            for(int i = head; i < head + frame_size && (i < MEMORY_size / 4); i++)
+               if(MEMORY[i] != 0){
+                  valid_blank = 0;
+                  break;
+               }
+            if(valid_blank){
+               put_process_to_index(head, frame_size, process_id, process_size);
+               break;
+            }
+            
+         }
+         head++;
+      }
    }
+
+   else
+      printf("Failed\n");
 }
 
 //@ark
