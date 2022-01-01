@@ -114,7 +114,7 @@ void best_fit(int process_id, int process_size)
       {
          if (MEMORY[right] != 0)
          {
-            space = right - left;               //>=//
+            space = right - left;               
             if (space >= frame_size && best_size >= space)
             {
                best_ind = left;
@@ -123,7 +123,7 @@ void best_fit(int process_id, int process_size)
             left = right + 1;
          }
       }
-      space = right - left;               //>=//
+      space = right - left;               
       if (space >= frame_size && best_size >= space)
       {
          best_ind = left;
