@@ -205,7 +205,7 @@ void worst_fit(int process_id, int process_size)
       }
    }
 }
-
+//@fuzuli
 void start_process(int process_id, int process_size)
 {
    switch (method)
